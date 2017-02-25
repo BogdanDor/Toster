@@ -6,6 +6,11 @@ import android.os.Bundle;
 import android.text.Html;
 import android.widget.TextView;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
                 String result;
                 try {
                     URL url = new URL(urls[0]);
-                    result = downloadUrl(url);
+                    result = getAllQuestion(urls[0]);
                 } catch (Exception e) {
                     result = "Error";
                 }
@@ -102,5 +107,12 @@ public class MainActivity extends AppCompatActivity {
             rsz = in.read(buffer, 0, buffer.length);
         }
         return out.toString();
+    }
+
+    private String getAllQuestion(String url) throws IOException {
+        Document doc = Jsoup.connect(url).get();
+        Elements questions = doc.select("h2.question__title");
+        String result = questions.html();
+        return result;
     }
 }
