@@ -7,15 +7,9 @@ import android.text.Html;
 import android.text.Spanned;
 import android.widget.TextView;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
+import com.bogdandor.toster.model.Loader;
 
 public class MainActivity extends AppCompatActivity {
-
-    private String siteUrl = "https://www.toster.ru";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,26 +17,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView myTextView = (TextView) findViewById(R.id.myTextView);
 
-        new AsyncTask<String, Void, String>() {
+        new AsyncTask<Void, Void, String>() {
 
-            protected String doInBackground(String... urls) {
-                String result;
+            protected String doInBackground(Void... params) {
+                String text;
                 try {
-                    result = getAllQuestion(urls[0]);
+                    text = Loader.getInstance().getAllQuestions();
                 } catch (Exception e) {
-                    result = "Error";
+                    text = "Error";
                 }
-                return result;
+                return text;
             }
 
-            protected void onPostExecute(String result) {
-                myTextView.setText(fromHtml(result));
+            protected void onPostExecute(String text) {
+                myTextView.setText(fromHtml(text));
             }
-        }.execute(siteUrl);
+        }.execute();
     }
 
     @SuppressWarnings("deprecation")
-    public Spanned fromHtml(String html){
+    private Spanned fromHtml(String html){
         Spanned result;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             result = Html.fromHtml(html,Html.FROM_HTML_MODE_LEGACY);
@@ -52,10 +46,4 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    private String getAllQuestion(String url) throws IOException {
-        Document doc = Jsoup.connect(url).get();
-        Elements questions = doc.select("h2.question__title");
-        String result = questions.html();
-        return result;
-    }
 }
