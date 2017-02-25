@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
             protected String doInBackground(Void... params) {
                 String text;
                 try {
-                    text = Loader.getInstance().getAllQuestions();
+                    text = Loader.getInstance().getQuestions()[0].title;
                 } catch (Exception e) {
                     text = "Error";
                 }

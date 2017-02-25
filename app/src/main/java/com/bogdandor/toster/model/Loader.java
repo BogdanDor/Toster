@@ -14,11 +14,17 @@ public class Loader {
         return ourInstance;
     }
 
-    public String getAllQuestions() throws IOException {
+    public Question[] getQuestions() throws IOException {
         Document doc = Jsoup.connect(siteUrl).get();
-        Elements questions = doc.select("h2.question__title");
-        String result = questions.html();
-        return result;
+        Elements elements = doc.select("h2.question__title");
+        Question[] questions = new Question[elements.size()];
+        for (int i=0; i<questions.length; i++) {
+            questions[i] = new Question();
+        }
+        for (int i=0; i<elements.size(); i++) {
+            questions[i].title = elements.get(i).text();
+        }
+        return questions;
     }
 
     private Loader() {  }
