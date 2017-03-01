@@ -1,8 +1,11 @@
 package com.bogdandor.toster;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.widget.TextView;
 
 import com.bogdandor.toster.model.PageQuestions;
@@ -34,7 +37,18 @@ public class QuestionActivity extends AppCompatActivity {
 
     void viewQuestion(Question question) {
         title.setText(question.title);
-        text.setText(question.text);
+        text.setText(fromHtml(question.text));
+    }
+
+    @SuppressWarnings("deprecation")
+    private Spanned fromHtml(String html) {
+        Spanned result;
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(html);
+        }
+        return result;
     }
 
     private class DownloaderQuestion extends AsyncTask<Question, Void, Question> {

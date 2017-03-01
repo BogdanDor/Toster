@@ -17,7 +17,7 @@ public class Question {
 
     public void load() throws IOException {
         Document doc = Jsoup.connect(url).get();
-        text = doc.select(".question__text").text();
+        text = doc.select(".question__text").html();
     }
 
     public String toString() {
