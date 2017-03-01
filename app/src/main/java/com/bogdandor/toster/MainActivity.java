@@ -1,9 +1,11 @@
 package com.bogdandor.toster;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -27,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
         listQuestions = (ListView) findViewById(R.id.list_questions);
         prev = (Button) findViewById(R.id.prev);
         next = (Button) findViewById(R.id.next);
-
         new DownloaderPage().execute();
     }
 
@@ -40,12 +41,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void viewPageQuestions(PageQuestions pageQuestions) throws IOException {
-        Question[] questions = pageQuestions.getQuestions();
+        final Question[] questions = pageQuestions.getQuestions();
         ArrayAdapter<Question> listAdapter = new ArrayAdapter<Question>(
                 MainActivity.this,
                 android.R.layout.simple_list_item_1,
                 questions);
         listQuestions.setAdapter(listAdapter);
+        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(MainActivity.this, QuestionActivity.class);
+                intent.putExtra(QuestionActivity.EXTRA_QUESTIONNO, i);
+                startActivity(intent);
+            }
+        };
+        listQuestions.setOnItemClickListener(itemClickListener);
 
         prevPage = pageQuestions.getPrevPage();
         prev.setVisibility(View.VISIBLE);

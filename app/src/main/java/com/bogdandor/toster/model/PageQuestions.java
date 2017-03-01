@@ -8,10 +8,12 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 public class PageQuestions {
-    Document doc;
+    public static PageQuestions currentPage;
+    private Document doc;
 
     public PageQuestions(String siteUrl) throws IOException {
         doc = Jsoup.connect(siteUrl).get();
+        currentPage = this;
     }
 
     public PageQuestions() throws IOException {
@@ -22,10 +24,9 @@ public class PageQuestions {
         Elements elements = doc.select("h2.question__title");
         Question[] questions = new Question[elements.size()];
         for (int i=0; i<questions.length; i++) {
-            questions[i] = new Question();
-        }
-        for (int i=0; i<elements.size(); i++) {
-            questions[i].title = elements.get(i).text();
+            String title = elements.get(i).text();
+            String url = elements.get(i).select("a[href]").first().attr("href");
+            questions[i] = new Question(title, url);
         }
         return questions;
     }
