@@ -1,7 +1,7 @@
 package com.bogdandor.toster.mapper;
 
-import com.bogdandor.toster.model.PageQuestions;
-import com.bogdandor.toster.model.Question;
+import com.bogdandor.toster.entity.PageQuestions;
+import com.bogdandor.toster.entity.Question;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;

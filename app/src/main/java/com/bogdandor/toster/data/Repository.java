@@ -2,8 +2,8 @@ package com.bogdandor.toster.data;
 
 import com.bogdandor.toster.mapper.PageQuestionsMapper;
 import com.bogdandor.toster.mapper.QuestionMapper;
-import com.bogdandor.toster.model.PageQuestions;
-import com.bogdandor.toster.model.Question;
+import com.bogdandor.toster.entity.PageQuestions;
+import com.bogdandor.toster.entity.Question;
 
 import java.io.IOException;
 

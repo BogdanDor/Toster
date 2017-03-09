@@ -1,6 +1,6 @@
 package com.bogdandor.toster.mapper;
 
-import com.bogdandor.toster.model.Question;
+import com.bogdandor.toster.entity.Question;
 
 import org.jsoup.nodes.Document;
 

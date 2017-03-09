@@ -1,4 +1,4 @@
-package com.bogdandor.toster.model;
+package com.bogdandor.toster.entity;
 
 public class PageQuestions {
     private Question[] questions;
