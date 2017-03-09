@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.bogdandor.toster.data.Repository;
 import com.bogdandor.toster.model.PageQuestions;
 import com.bogdandor.toster.model.Question;
 
@@ -29,18 +30,18 @@ public class MainActivity extends AppCompatActivity {
         listQuestions = (ListView) findViewById(R.id.list_questions);
         prev = (Button) findViewById(R.id.prev);
         next = (Button) findViewById(R.id.next);
-        new DownloaderPage().execute();
+        new DownloaderPageQuestions().execute();
     }
 
     public void onClickPrev(View view) {
-        new DownloaderPage().execute(prevPage);
+        new DownloaderPageQuestions().execute(prevPage);
     }
 
     public void onClickNext(View view) {
-        new DownloaderPage().execute(nextPage);
+        new DownloaderPageQuestions().execute(nextPage);
     }
 
-    void viewPageQuestions(PageQuestions pageQuestions) throws IOException {
+    void viewPageQuestions(final PageQuestions pageQuestions) throws IOException {
         final Question[] questions = pageQuestions.getQuestions();
         ArrayAdapter<Question> listAdapter = new ArrayAdapter<Question>(
                 MainActivity.this,
@@ -51,18 +52,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(MainActivity.this, QuestionActivity.class);
-                intent.putExtra(QuestionActivity.EXTRA_QUESTIONNO, i);
+                intent.putExtra(QuestionActivity.QUESTION_URL, pageQuestions.getQuestions()[i].getUrl());
                 startActivity(intent);
             }
         };
         listQuestions.setOnItemClickListener(itemClickListener);
 
-        prevPage = pageQuestions.getPrevPage();
+        prevPage = pageQuestions.getPrevPageUrl();
         prev.setVisibility(View.VISIBLE);
         if (prevPage == null) {
             prev.setVisibility(View.INVISIBLE);
         }
-        nextPage = pageQuestions.getNextPage();
+        nextPage = pageQuestions.getNextPageUrl();
         next.setVisibility(View.VISIBLE);
         if (nextPage == null) {
             next.setVisibility(View.INVISIBLE);
@@ -70,17 +71,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private class DownloaderPage extends AsyncTask<String, Void, PageQuestions> {
+    private class DownloaderPageQuestions extends AsyncTask<String, Void, PageQuestions> {
         Exception exception = null;
 
         protected PageQuestions doInBackground(String... params) {
             PageQuestions pageQuestions = null;
+            Repository repository = new Repository();
             try {
                 if (params.length == 0) {
-                    pageQuestions = new PageQuestions();
+                    pageQuestions = repository.getPageQuestions();
                 } else {
                     String url = params[0];
-                    pageQuestions = new PageQuestions(url);
+                    pageQuestions = repository.getPageQuestions(url);
                 }
             } catch (Exception e) {
                 exception = e;
@@ -99,6 +101,5 @@ public class MainActivity extends AppCompatActivity {
                 setContentView(R.layout.error);
             }
         }
-
     }
 }

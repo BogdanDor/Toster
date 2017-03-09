@@ -1,23 +1,32 @@
 package com.bogdandor.toster.model;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-
 public class Question {
-    public String title;
-    public String url;
-    public String text;
+    private String title;
+    private String url;
+    private String text;
 
-    Question(String title, String url) {
+    public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setUrl(String url) {
         this.url = url;
     }
 
-    public void load() throws IOException {
-        Document doc = Jsoup.connect(url).get();
-        text = doc.select(".question__text").html();
+    public String getUrl() {
+        return url;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
     }
 
     public String toString() {

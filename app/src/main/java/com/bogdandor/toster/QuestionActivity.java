@@ -8,13 +8,11 @@ import android.text.Html;
 import android.text.Spanned;
 import android.widget.TextView;
 
-import com.bogdandor.toster.model.PageQuestions;
+import com.bogdandor.toster.data.Repository;
 import com.bogdandor.toster.model.Question;
 
-import java.io.IOException;
-
 public class QuestionActivity extends AppCompatActivity {
-    public static final String EXTRA_QUESTIONNO = "questionNo";
+    public static final String QUESTION_URL = "questionUrl";
     private TextView title;
     private TextView text;
 
@@ -26,18 +24,13 @@ public class QuestionActivity extends AppCompatActivity {
         title = (TextView) findViewById(R.id.title);
         text = (TextView) findViewById(R.id.text);
 
-        int questionNo = (Integer) getIntent().getExtras().get(EXTRA_QUESTIONNO);
-        try {
-            Question question = PageQuestions.currentPage.getQuestions()[questionNo];
-            new DownloaderQuestion().execute(question);
-        } catch (IOException e) {
-            setContentView(R.layout.error);
-        }
+        String questionUrl = (String) getIntent().getExtras().get(QUESTION_URL);
+        new DownloaderQuestion().execute(questionUrl);
     }
 
     void viewQuestion(Question question) {
-        title.setText(question.title);
-        text.setText(fromHtml(question.text));
+        title.setText(question.getTitle());
+        text.setText(fromHtml(question.getText()));
     }
 
     @SuppressWarnings("deprecation")
@@ -51,14 +44,15 @@ public class QuestionActivity extends AppCompatActivity {
         return result;
     }
 
-    private class DownloaderQuestion extends AsyncTask<Question, Void, Question> {
+    private class DownloaderQuestion extends AsyncTask<String, Void, Question> {
         Exception exception = null;
 
-        protected Question doInBackground(Question... params) {
+        protected Question doInBackground(String... params) {
             Question question = null;
+            Repository repository = new Repository();
             try {
-                question = params[0];
-                question.load();
+                String url = params[0];
+                question = repository.getQuestion(url);
             } catch (Exception e) {
                 exception = e;
             }
@@ -72,7 +66,5 @@ public class QuestionActivity extends AppCompatActivity {
                 setContentView(R.layout.error);
             }
         }
-
     }
-
 }
