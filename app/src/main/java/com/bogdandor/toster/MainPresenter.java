@@ -5,15 +5,12 @@ import android.os.AsyncTask;
 import com.bogdandor.toster.data.Repository;
 import com.bogdandor.toster.entity.PageQuestions;
 
-public class MainPresenter {
+public class MainPresenter implements Presenter<MainActivity> {
     private MainActivity view;
     private PageQuestions pageQuestions;
 
-    MainPresenter(MainActivity view) {
+    public MainPresenter(MainActivity view) {
         this.view = view;
-    }
-
-    public void onCreate() {
         new DownloaderPageQuestions().execute();
     }
 
@@ -32,36 +29,53 @@ public class MainPresenter {
         view.showQuestion(urlQuestion);
     }
 
-    private class DownloaderPageQuestions extends AsyncTask<String, Void, PageQuestions> {
-        Exception exception = null;
+    @Override
+    public void onViewAttached(MainActivity view) {
+        this.view = view;
+        if (pageQuestions != null) {
+            view.showArray(pageQuestions.getQuestions());
+            view.showPrevButton(pageQuestions.getPrevPageUrl());
+            view.showNextButton(pageQuestions.getNextPageUrl());
+        }
+    }
 
-        protected PageQuestions doInBackground(String... params) {
+    @Override
+    public void onViewDetached() {
+        this.view = null;
+    }
+
+    @Override
+    public void onDestroyed() {
+        pageQuestions = null;
+    }
+
+    private class DownloaderPageQuestions extends AsyncTask<String, Void, Exception> {
+
+        protected Exception doInBackground(String... params) {
+            Exception exception = null;
             Repository repository = new Repository();
-            PageQuestions pageQuestions = null;
             try {
                 if (params.length == 0) {
-                    pageQuestions = repository.getPageQuestions();
+                    MainPresenter.this.pageQuestions = repository.getPageQuestions();
                 } else {
                     String url = params[0];
-                    pageQuestions = repository.getPageQuestions(url);
+                    MainPresenter.this.pageQuestions = repository.getPageQuestions(url);
                 }
             } catch (Exception e) {
                 exception = e;
             }
-            return pageQuestions;
+            return exception;
         }
 
-        protected void onPostExecute(PageQuestions pageQuestions) {
-            try {
-                if (exception == null) {
-                    MainPresenter.this.pageQuestions = pageQuestions;
-                    view.showArray(pageQuestions.getQuestions());
-                    view.showPrevButton(pageQuestions.getPrevPageUrl());
-                    view.showNextButton(pageQuestions.getNextPageUrl());
-                } else {
-                    view.showError();
-                }
-            } catch (Exception e) {
+        protected void onPostExecute(Exception exception) {
+            if (view == null) {
+                return;
+            }
+            if (exception == null) {
+                view.showArray(pageQuestions.getQuestions());
+                view.showPrevButton(pageQuestions.getPrevPageUrl());
+                view.showNextButton(pageQuestions.getNextPageUrl());
+            } else {
                 view.showError();
             }
         }

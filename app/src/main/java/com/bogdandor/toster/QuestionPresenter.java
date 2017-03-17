@@ -5,34 +5,53 @@ import android.os.AsyncTask;
 import com.bogdandor.toster.data.Repository;
 import com.bogdandor.toster.entity.Question;
 
-public class QuestionPresenter {
+public class QuestionPresenter implements Presenter<QuestionActivity> {
     QuestionActivity view;
+    Question question;
 
     QuestionPresenter(QuestionActivity view) {
         this.view = view;
-    }
-
-    public void onCreate() {
         String questionUrl = view.getQuestionUrl();
         new DownloaderQuestion().execute(questionUrl);
     }
 
-    private class DownloaderQuestion extends AsyncTask<String, Void, Question> {
-        Exception exception = null;
+    @Override
+    public void onViewAttached(QuestionActivity view) {
+        this.view = view;
+        if (question != null) {
+            view.showQuestionText(question.getTitle());
+            view.showQuestionText(question.getText());
+        }
+    }
 
-        protected Question doInBackground(String... params) {
-            Question question = null;
+    @Override
+    public void onViewDetached() {
+        this.view = null;
+    }
+
+    @Override
+    public void onDestroyed() {
+        question = null;
+    }
+
+    private class DownloaderQuestion extends AsyncTask<String, Void, Exception> {
+
+        protected Exception doInBackground(String... params) {
+            Exception exception = null;
             Repository repository = new Repository();
             try {
                 String url = params[0];
-                question = repository.getQuestion(url);
+                QuestionPresenter.this.question = repository.getQuestion(url);
             } catch (Exception e) {
                 exception = e;
             }
-            return question;
+            return exception;
         }
 
-        protected void onPostExecute(Question question) {
+        protected void onPostExecute(Exception exception) {
+            if (view == null) {
+                return;
+            }
             if (exception == null) {
                 view.showQuestionTitle(question.getTitle());
                 view.showQuestionText(question.getText());
@@ -41,5 +60,4 @@ public class QuestionPresenter {
             }
         }
     }
-
 }
