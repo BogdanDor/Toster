@@ -4,6 +4,7 @@ public class Question {
     private String title;
     private String url;
     private String text;
+    private Answer[] answers;
 
     public void setTitle(String title) {
         this.title = title;
@@ -27,6 +28,14 @@ public class Question {
 
     public String getText() {
         return text;
+    }
+
+    public void setAswers(Answer[] answers) {
+        this.answers = answers;
+    }
+
+    public Answer[] getAnswers() {
+        return answers;
     }
 
     public String toString() {

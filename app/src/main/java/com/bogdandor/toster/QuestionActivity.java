@@ -7,15 +7,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class QuestionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<QuestionPresenter> {
     public static final String QUESTION_URL = "questionUrl";
     private TextView title;
     private TextView text;
+    private ListView listAnswers;
     private QuestionPresenter presenter;
     private static final int LOADER_ID = 102;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,7 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
         setContentView(R.layout.activity_question);
         title = (TextView) findViewById(R.id.title);
         text = (TextView) findViewById(R.id.text);
+        listAnswers = (ListView) findViewById(R.id.list_answers);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
@@ -44,6 +47,14 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
 
     public void showQuestionText(String s) {
         text.setText(fromHtml(s));
+    }
+
+    public void showArray(Object[] objects) {
+        ArrayAdapter<Object> arrayAdapter = new ArrayAdapter<Object>(
+                QuestionActivity.this,
+                android.R.layout.simple_list_item_1,
+                objects);
+        listAnswers.setAdapter(arrayAdapter);
     }
 
     public void showError() {
@@ -68,7 +79,6 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
     public void onLoaderReset(Loader<QuestionPresenter> loader) {
         presenter = null;
     }
-
 
     @SuppressWarnings("deprecation")
     private Spanned fromHtml(String html) {

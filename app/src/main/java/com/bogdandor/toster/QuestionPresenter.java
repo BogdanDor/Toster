@@ -21,6 +21,7 @@ public class QuestionPresenter implements Presenter<QuestionActivity> {
         if (question != null) {
             view.showQuestionText(question.getTitle());
             view.showQuestionText(question.getText());
+            view.showArray(question.getAnswers());
         }
     }
 
@@ -55,6 +56,7 @@ public class QuestionPresenter implements Presenter<QuestionActivity> {
             if (exception == null) {
                 view.showQuestionTitle(question.getTitle());
                 view.showQuestionText(question.getText());
+                view.showArray(question.getAnswers());
             } else {
                 view.showError();
             }
