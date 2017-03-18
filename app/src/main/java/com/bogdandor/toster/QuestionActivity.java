@@ -7,12 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 public class QuestionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<QuestionPresenter> {
     public static final String QUESTION_URL = "questionUrl";
+    private View header;
     private TextView title;
     private TextView text;
     private ListView listAnswers;
@@ -23,9 +25,11 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
-        title = (TextView) findViewById(R.id.title);
-        text = (TextView) findViewById(R.id.text);
+        header = getLayoutInflater().inflate(R.layout.question_header, null);
         listAnswers = (ListView) findViewById(R.id.list_answers);
+        title = (TextView) header.findViewById(R.id.title);
+        text = (TextView) header.findViewById(R.id.text);
+        listAnswers.addHeaderView(header);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 

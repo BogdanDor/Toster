@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<MainPresenter> {
+    private View footer;
     private ListView listQuestions;
     private Button prev;
     private Button next;
@@ -22,9 +23,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        footer = getLayoutInflater().inflate(R.layout.main_footer, null);
         listQuestions = (ListView) findViewById(R.id.list_questions);
-        prev = (Button) findViewById(R.id.prev);
-        next = (Button) findViewById(R.id.next);
+        prev = (Button) footer.findViewById(R.id.prev);
+        next = (Button) footer.findViewById(R.id.next);
+        listQuestions.addFooterView(footer);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
