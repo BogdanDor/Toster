@@ -1,9 +1,11 @@
 package com.bogdandor.toster.mapper;
 
 import com.bogdandor.toster.entity.Answer;
+import com.bogdandor.toster.entity.Comment;
 import com.bogdandor.toster.entity.Question;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -16,6 +18,7 @@ public class QuestionMapper {
             question = new Question();
             question.setTitle(transformTitle(document));
             question.setText(transformText(document));
+            question.setComments(transformComments(document));
             question.setAswers(transformAnswers(document));
         }
         return question;
@@ -31,15 +34,36 @@ public class QuestionMapper {
 
     private Answer[] transformAnswers(Document document) throws IOException {
         Answer[] answers = null;
-        Elements elements = document.select(".answer__text");
+        Elements elements = document.select(".answer_wrapper");
         if (!elements.isEmpty()) {
             answers = new Answer[elements.size()];
             for (int i=0; i<answers.length; i++) {
-                String text = elements.get(i).text();
+                String text = elements.get(i).select(".answer__text").html();
+                Comment[] comments = transformComments(elements.get(i));
                 answers[i] = new Answer();
                 answers[i].setText(text);
+                answers[i].setComments(comments);
             }
         }
         return answers;
+    }
+
+    private Comment[] transformComments(Element e) {
+        Comment[] comments = null;
+        Elements elements = e.select(".comment__text");
+        if (!elements.isEmpty()) {
+            comments = new Comment[elements.size()];
+            for (int i=0; i<comments.length; i++) {
+                String text = elements.get(i).html();
+                comments[i] = new Comment();
+                comments[i].setText(text);
+            }
+        }
+        return comments;
+    }
+
+    private Comment[] transformComments(Document document) {
+        Element element = document.select(".question__comments").first();
+        return transformComments(element);
     }
 }

@@ -8,16 +8,23 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
+
+import com.bogdandor.toster.entity.Answer;
+import com.bogdandor.toster.entity.Comment;
+import com.bogdandor.toster.entity.Question;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QuestionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<QuestionPresenter> {
     public static final String QUESTION_URL = "questionUrl";
     private View header;
     private TextView title;
-    private TextView text;
-    private ListView listAnswers;
+    private ExpandableListView expListQuestion;
     private QuestionPresenter presenter;
     private static final int LOADER_ID = 102;
 
@@ -26,10 +33,9 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
         header = getLayoutInflater().inflate(R.layout.question_header, null);
-        listAnswers = (ListView) findViewById(R.id.list_answers);
         title = (TextView) header.findViewById(R.id.title);
-        text = (TextView) header.findViewById(R.id.text);
-        listAnswers.addHeaderView(header);
+        expListQuestion = (ExpandableListView) findViewById(R.id.exp_list_question);
+        expListQuestion.addHeaderView(header);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
@@ -45,20 +51,59 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
         super.onStop();
     }
 
-    public void showQuestionTitle(String s) {
-        title.setText(s);
-    }
+    public void showQuestion(Question question) {
+        title.setText(question.getTitle());
 
-    public void showQuestionText(String s) {
-        text.setText(fromHtml(s));
-    }
+        Map<String, String> map;
+        ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
+        ArrayList<ArrayList<Map<String, String>>> childDataList = new ArrayList<>();
+        ArrayList<Map<String, String>> childDataItemList;
 
-    public void showArray(Object[] objects) {
-        ArrayAdapter<Object> arrayAdapter = new ArrayAdapter<Object>(
-                QuestionActivity.this,
-                android.R.layout.simple_list_item_1,
-                objects);
-        listAnswers.setAdapter(arrayAdapter);
+        map = new HashMap<>();
+        map.put("groupName", question.getText());
+        groupDataList.add(map);
+        childDataItemList = new ArrayList<>();
+        Comment[] comments = question.getComments();
+        if (comments != null) {
+            for (Comment comment : comments) {
+                map = new HashMap<>();
+                map.put("comment", comment.getText());
+                childDataItemList.add(map);
+            }
+            childDataList.add(childDataItemList);
+        }
+
+        Answer[] answers = question.getAnswers();
+        if (answers != null) {
+            for (Answer answer : answers) {
+                map = new HashMap<>();
+                map.put("groupName", answer.getText());
+                groupDataList.add(map);
+                childDataItemList = new ArrayList<>();
+                comments = answer.getComments();
+                if (comments != null) {
+                    for (Comment comment : comments) {
+                        map = new HashMap<>();
+                        map.put("comment", comment.getText());
+                        childDataItemList.add(map);
+                    }
+                    childDataList.add(childDataItemList);
+                }
+            }
+        }
+
+        SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
+                this,
+                groupDataList,
+                R.layout.group,
+                new String[] { "groupName" },
+                new int[] { R.id.text_group },
+                childDataList,
+                R.layout.item,
+                new String[] { "comment" },
+                new int[] { R.id.text_item }
+        );
+        expListQuestion.setAdapter(adapter);
     }
 
     public void showError() {

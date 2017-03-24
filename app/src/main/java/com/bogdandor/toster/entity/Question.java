@@ -5,6 +5,7 @@ public class Question {
     private String url;
     private String text;
     private Answer[] answers;
+    private Comment[] comments;
 
     public void setTitle(String title) {
         this.title = title;
@@ -36,6 +37,14 @@ public class Question {
 
     public Answer[] getAnswers() {
         return answers;
+    }
+
+    public void setComments(Comment[] comments) {
+        this.comments = comments;
+    }
+
+    public Comment[] getComments() {
+        return comments;
     }
 
     public String toString() {
