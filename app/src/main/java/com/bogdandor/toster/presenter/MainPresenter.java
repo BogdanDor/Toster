@@ -1,9 +1,11 @@
-package com.bogdandor.toster;
+package com.bogdandor.toster.presenter;
 
 import android.os.AsyncTask;
 
+import com.bogdandor.toster.view.Presenter;
 import com.bogdandor.toster.data.Repository;
 import com.bogdandor.toster.entity.PageQuestions;
+import com.bogdandor.toster.view.MainActivity;
 
 public class MainPresenter implements Presenter<MainActivity> {
     private MainActivity view;

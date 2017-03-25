@@ -1,4 +1,4 @@
-package com.bogdandor.toster;
+package com.bogdandor.toster.view;
 
 import android.content.Context;
 import android.os.Build;
@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import com.bogdandor.toster.R;
 import com.bogdandor.toster.entity.Answer;
 import com.bogdandor.toster.entity.Comment;
 import com.bogdandor.toster.entity.Question;

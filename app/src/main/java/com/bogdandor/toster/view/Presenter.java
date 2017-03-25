@@ -1,4 +1,4 @@
-package com.bogdandor.toster;
+package com.bogdandor.toster.view;
 
 public interface Presenter<V> {
     void onViewAttached(V view);

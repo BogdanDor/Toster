@@ -1,4 +1,4 @@
-package com.bogdandor.toster;
+package com.bogdandor.toster.view;
 
 import android.content.Context;
 import android.support.v4.content.Loader;

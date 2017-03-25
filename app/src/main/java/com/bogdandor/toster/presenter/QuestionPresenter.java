@@ -1,15 +1,17 @@
-package com.bogdandor.toster;
+package com.bogdandor.toster.presenter;
 
 import android.os.AsyncTask;
 
+import com.bogdandor.toster.view.Presenter;
 import com.bogdandor.toster.data.Repository;
 import com.bogdandor.toster.entity.Question;
+import com.bogdandor.toster.view.QuestionActivity;
 
 public class QuestionPresenter implements Presenter<QuestionActivity> {
     QuestionActivity view;
     Question question;
 
-    QuestionPresenter(QuestionActivity view) {
+    public QuestionPresenter(QuestionActivity view) {
         this.view = view;
         String questionUrl = view.getQuestionUrl();
         new DownloaderQuestion().execute(questionUrl);

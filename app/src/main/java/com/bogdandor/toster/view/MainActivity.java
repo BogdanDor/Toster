@@ -1,4 +1,4 @@
-package com.bogdandor.toster;
+package com.bogdandor.toster.view;
 
 import android.content.Intent;
 import android.support.v4.app.LoaderManager;
@@ -10,6 +10,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+
+import com.bogdandor.toster.presenter.MainPresenter;
+import com.bogdandor.toster.R;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<MainPresenter> {
     private View footer;
