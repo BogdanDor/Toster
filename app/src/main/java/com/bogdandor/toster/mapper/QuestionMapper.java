@@ -4,6 +4,7 @@ import com.bogdandor.toster.entity.Answer;
 import com.bogdandor.toster.entity.Comment;
 import com.bogdandor.toster.entity.Question;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -64,6 +65,9 @@ public class QuestionMapper {
 
     private Comment[] transformComments(Document document) {
         Element element = document.select(".question__comments").first();
-        return transformComments(element);
+        Element e = Jsoup.parse(element.html());
+        e.select(".comment__text").select(".comment__date").remove();
+        Comment[] comments = transformComments(e);
+        return comments;
     }
 }
