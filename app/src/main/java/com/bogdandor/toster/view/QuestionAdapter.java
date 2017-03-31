@@ -91,14 +91,19 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.group, null);
         }
         String text;
+        String authorAnswer;
         if (groupPosition == 0) {
             text = question.getText();
+            authorAnswer = question.getAuthor().getName();
         } else {
             text = question.getAnswers()[groupPosition - 1].getText();
+            authorAnswer = question.getAnswers()[groupPosition - 1].getAuthor().getName();
         }
         TextView textGroup = (TextView) convertView.findViewById(R.id.text_group);
+        TextView answerAuthor = (TextView) convertView.findViewById(R.id.answer_author);
         textGroup.setMovementMethod(LinkMovementMethod.getInstance());
         textGroup.setText(fromHtml(text));
+        answerAuthor.setText(authorAnswer);
         Button expandGroup = (Button) convertView.findViewById(R.id.expand_group);
         expandGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,8 +125,10 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
         convertView = inflater.inflate(R.layout.item, parent, false);
         Comment comment = (Comment) getChild(groupPosition, childPosition);
         TextView textItem = (TextView) convertView.findViewById(R.id.text_item);
+        TextView authorComment = (TextView) convertView.findViewById(R.id.comment_author);
         textItem.setMovementMethod(LinkMovementMethod.getInstance());
         textItem.setText(fromHtml(comment.getText()));
+        authorComment.setText(comment.getAuthor().getName());
         return convertView;
     }
 
