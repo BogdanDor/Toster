@@ -88,7 +88,25 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
     public View getGroupView(final int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.group, null);
+            if (getChildrenCount(groupPosition) == 0) {
+                convertView = inflater.inflate(R.layout.empty_group, null);
+            } else {
+                convertView = inflater.inflate(R.layout.group, null);
+                Button expandGroup = (Button) convertView.findViewById(R.id.expand_group);
+                expandGroup.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ExpandableListView expListView = (ExpandableListView) view.getParent().getParent();
+                        if (expListView.isGroupExpanded(groupPosition)) {
+                            expListView.collapseGroup(groupPosition);
+                            ((Button) view).setText(R.string.show_comments);
+                        } else {
+                            expListView.expandGroup(groupPosition);
+                            ((Button) view).setText(R.string.hide_comments);
+                        }
+                    }
+                });
+            }
         }
         String text;
         String authorAnswer;
@@ -104,20 +122,6 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
         textGroup.setMovementMethod(LinkMovementMethod.getInstance());
         textGroup.setText(fromHtml(text));
         answerAuthor.setText(authorAnswer);
-        Button expandGroup = (Button) convertView.findViewById(R.id.expand_group);
-        expandGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ExpandableListView expListView = (ExpandableListView) view.getParent().getParent();
-                if (expListView.isGroupExpanded(groupPosition)) {
-                    expListView.collapseGroup(groupPosition);
-                    ((Button) view).setText(R.string.show_comments);
-                } else {
-                    expListView.expandGroup(groupPosition);
-                    ((Button) view).setText(R.string.hide_comments);
-                }
-            }
-        });
         return convertView;
     }
 
