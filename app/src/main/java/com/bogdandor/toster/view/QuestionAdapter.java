@@ -111,8 +111,10 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
                 ExpandableListView expListView = (ExpandableListView) view.getParent().getParent();
                 if (expListView.isGroupExpanded(groupPosition)) {
                     expListView.collapseGroup(groupPosition);
+                    ((Button) view).setText(R.string.show_comments);
                 } else {
                     expListView.expandGroup(groupPosition);
+                    ((Button) view).setText(R.string.hide_comments);
                 }
             }
         });

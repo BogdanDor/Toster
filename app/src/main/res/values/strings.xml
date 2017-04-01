@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Toster</string>
+    <string name="show_comments">Показать комментарии</string>
+    <string name="hide_comments">Скрыть комментарии</string>
 </resources>
