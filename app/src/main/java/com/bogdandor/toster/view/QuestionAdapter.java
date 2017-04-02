@@ -31,18 +31,21 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
     public int getGroupCount() {
         Answer[] answers = question.getAnswers();
         if (answers == null) {
-            return 1;
+            return 1 * 2;
         }
-        return answers.length + 1;
+        return (answers.length + 1) * 2;
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
         Comment[] comments;
-        if (groupPosition == 0) {
+        if (groupPosition % 2 == 0) {
+            return 0;
+        }
+        if (groupPosition == 1) {
             comments = question.getComments();
         } else {
-            comments = question.getAnswers()[groupPosition - 1].getComments();
+            comments = question.getAnswers()[groupPosition/2 - 1].getComments();
         }
         if (comments == null) {
             return 0;
@@ -52,19 +55,25 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getGroup(int groupPosition) {
+        if (groupPosition % 2 != 0) {
+            return null;
+        }
         if (groupPosition == 0) {
             return question;
         }
-        return question.getAnswers()[groupPosition - 1];
+        return question.getAnswers()[(groupPosition / 2) - 1];
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
         Comment[] comments;
-        if (groupPosition == 0) {
+        if (groupPosition % 2 == 0) {
+            return null;
+        }
+        if (groupPosition == 1) {
             comments = question.getComments();
         } else {
-            comments = question.getAnswers()[groupPosition - 1].getComments();
+            comments = question.getAnswers()[groupPosition/2 - 1].getComments();
         }
         return comments[childPosition];
     }
@@ -87,41 +96,33 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(final int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
-        if (convertView == null) {
+        if (groupPosition % 2 != 0) {
+            convertView = inflater.inflate(R.layout.group_indicator, null);
+            TextView groupIndicator = (TextView) convertView.findViewById(R.id.group_indicator);
             if (getChildrenCount(groupPosition) == 0) {
-                convertView = inflater.inflate(R.layout.empty_group, null);
+                groupIndicator.setText(R.string.no_comments_yet);
+            } else if (isExpanded) {
+                groupIndicator.setText(R.string.hide_comments);
             } else {
-                convertView = inflater.inflate(R.layout.group, null);
-                Button expandGroup = (Button) convertView.findViewById(R.id.expand_group);
-                expandGroup.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ExpandableListView expListView = (ExpandableListView) view.getParent().getParent();
-                        if (expListView.isGroupExpanded(groupPosition)) {
-                            expListView.collapseGroup(groupPosition);
-                            ((Button) view).setText(R.string.show_comments);
-                        } else {
-                            expListView.expandGroup(groupPosition);
-                            ((Button) view).setText(R.string.hide_comments);
-                        }
-                    }
-                });
+                groupIndicator.setText(R.string.show_comments);
             }
-        }
-        String text;
-        String authorAnswer;
-        if (groupPosition == 0) {
-            text = question.getText();
-            authorAnswer = question.getAuthor().getName();
         } else {
-            text = question.getAnswers()[groupPosition - 1].getText();
-            authorAnswer = question.getAnswers()[groupPosition - 1].getAuthor().getName();
-        }
-        TextView textGroup = (TextView) convertView.findViewById(R.id.text_group);
-        TextView answerAuthor = (TextView) convertView.findViewById(R.id.answer_author);
-        textGroup.setMovementMethod(LinkMovementMethod.getInstance());
-        textGroup.setText(fromHtml(text));
-        answerAuthor.setText(authorAnswer);
+            convertView = inflater.inflate(R.layout.group_content, null);
+            String text;
+            String authorAnswer;
+            if (groupPosition == 0) {
+                text = question.getText();
+                authorAnswer = question.getAuthor().getName();
+            } else {
+                text = ((Answer)getGroup(groupPosition)).getText();
+                authorAnswer = ((Answer)getGroup(groupPosition)).getAuthor().getName();
+            }
+            TextView textGroup = (TextView) convertView.findViewById(R.id.text_group);
+            TextView answerAuthor = (TextView) convertView.findViewById(R.id.answer_author);
+            textGroup.setMovementMethod(LinkMovementMethod.getInstance());
+            textGroup.setText(fromHtml(text));
+            answerAuthor.setText(authorAnswer);
+         }
         return convertView;
     }
 
