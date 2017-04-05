@@ -5,7 +5,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bogdandor.toster.presenter.QuestionPresenter;
@@ -16,7 +16,7 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
     public static final String QUESTION_URL = "questionUrl";
     private View header;
     private TextView title;
-    private ExpandableListView questionView;
+    private ListView questionView;
     private QuestionPresenter presenter;
     private static final int LOADER_ID = 102;
 
@@ -26,7 +26,7 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
         setContentView(R.layout.activity_question);
         header = getLayoutInflater().inflate(R.layout.question_header, null);
         title = (TextView) header.findViewById(R.id.title);
-        questionView = (ExpandableListView) findViewById(R.id.question_view);
+        questionView = (ListView) findViewById(R.id.question_view);
         questionView.addHeaderView(header);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
