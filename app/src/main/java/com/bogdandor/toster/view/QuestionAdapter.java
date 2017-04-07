@@ -1,73 +1,102 @@
 package com.bogdandor.toster.view;
 
-import android.content.Context;
 import android.os.Build;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.bogdandor.toster.R;
 import com.bogdandor.toster.entity.Answer;
 import com.bogdandor.toster.entity.Comment;
 import com.bogdandor.toster.entity.Question;
 
 import java.util.ArrayList;
 
-public class QuestionAdapter extends BaseAdapter {
+public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHolder> {
+    private int titleResource;
+    private int titleViewResourceId;
+    private int itemResource;
+    private int nameAuthorViewResourceId;
+    private int textMessageViewResourceId;
     private ArrayList<Object> objects;
-    private LayoutInflater inflater;
 
-    public QuestionAdapter(Context context, Question question) {
-        inflater = LayoutInflater.from(context);
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private View view;
+
+        public ViewHolder(View v) {
+            super(v);
+            view = v;
+        }
+    }
+
+    public QuestionAdapter(int titleResource, int titleViewResourceId, int itemResource, int nameAuthorViewResourceId, int textMessageViewResourceId, Question question) {
+        this.titleResource = titleResource;
+        this.titleViewResourceId = titleViewResourceId;
+        this.itemResource = itemResource;
+        this.nameAuthorViewResourceId = nameAuthorViewResourceId;
+        this.textMessageViewResourceId = textMessageViewResourceId;
         objects = questionToArray(question);
     }
 
     @Override
-    public int getCount() {
-        return objects.size();
+    public QuestionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)                                                                                                                     {
+        View v;
+        if (viewType == 0) {
+            v = LayoutInflater.from(parent.getContext()).inflate(titleResource, parent, false);
+        } else {
+            v = LayoutInflater.from(parent.getContext()).inflate(itemResource, parent, false);
+        }
+        return new ViewHolder(v);
     }
 
     @Override
-    public Object getItem(int position) {
-        return objects.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = inflater.inflate(R.layout.item, parent, false);
-        TextView nameAuthor = (TextView) convertView.findViewById(R.id.name_author);
-        TextView textMessage = (TextView) convertView.findViewById(R.id.text_message);
-        String author = "";
-        String text = "";
-        Object object = getItem(position);
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        View view = holder.view;
+        if (getItemViewType(position) == 0) {
+            TextView titleField = (TextView) view.findViewById(titleViewResourceId);
+            String title = ((Question)objects.get(0)).getTitle();
+            titleField.setText(title);
+            return;
+        }
+        TextView nameAuthorField = (TextView) view.findViewById(nameAuthorViewResourceId);
+        TextView textMessageField = (TextView) view.findViewById(textMessageViewResourceId);
+        String nameAuthor = "";
+        String textMessage = "";
+        Object object = objects.get(position - 1);
         final String questionClassName = Question.class.getName();
         final String answerClassName = Answer.class.getName();
         final String commentClassName = Comment.class.getName();
         String objectClassName = object.getClass().getName();
         if (objectClassName == questionClassName) {
-            author = ((Question)object).getAuthor().getName();
-            text = ((Question)object).getText();
+            nameAuthor = ((Question)object).getAuthor().getName();
+            textMessage = ((Question)object).getText();
         } else if (objectClassName == answerClassName) {
-            author = ((Answer)object).getAuthor().getName();
-            text = ((Answer)object).getText();
+            nameAuthor = ((Answer)object).getAuthor().getName();
+            textMessage = ((Answer)object).getText();
         } else if (objectClassName == commentClassName) {
-            author = ((Comment)object).getAuthor().getName();
-            text = ((Comment)object).getText();
+            nameAuthor = ((Comment)object).getAuthor().getName();
+            textMessage = ((Comment)object).getText();
         }
-        textMessage.setMovementMethod(LinkMovementMethod.getInstance());
-        nameAuthor.setText(author);
-        textMessage.setText(fromHtml(text));
-        return convertView;
+        textMessageField.setMovementMethod(LinkMovementMethod.getInstance());
+        nameAuthorField.setText(nameAuthor);
+        textMessageField.setText(fromHtml(textMessage));
+    }
+
+    @Override
+    public int getItemCount() {
+        return objects.size() + 1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        switch (position) {
+            case 0 : return 0;
+            default: return 1;
+        }
     }
 
     private ArrayList<Object> questionToArray(Question question) {
