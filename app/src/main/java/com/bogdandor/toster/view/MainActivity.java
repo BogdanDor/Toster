@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void showArray(Object[] objects) {
         ArrayAdapter<Object> arrayAdapter = new ArrayAdapter<Object>(
                 MainActivity.this,
-                android.R.layout.simple_list_item_1,
+                R.layout.item,
+                R.id.text,
                 objects);
         listQuestions.setAdapter(arrayAdapter);
         AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
