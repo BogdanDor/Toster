@@ -10,93 +10,90 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bogdandor.toster.R;
 import com.bogdandor.toster.entity.Answer;
 import com.bogdandor.toster.entity.Comment;
 import com.bogdandor.toster.entity.Question;
 
 import java.util.ArrayList;
 
-public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHolder> {
-    private int titleResource;
-    private int titleViewResourceId;
-    private int itemResource;
-    private int nameAuthorViewResourceId;
-    private int textMessageViewResourceId;
+public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList<Object> objects;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private View view;
-
-        public ViewHolder(View v) {
-            super(v);
-            view = v;
-        }
-    }
-
-    public QuestionAdapter(int titleResource, int titleViewResourceId, int itemResource, int nameAuthorViewResourceId, int textMessageViewResourceId, Question question) {
-        this.titleResource = titleResource;
-        this.titleViewResourceId = titleViewResourceId;
-        this.itemResource = itemResource;
-        this.nameAuthorViewResourceId = nameAuthorViewResourceId;
-        this.textMessageViewResourceId = textMessageViewResourceId;
+    public QuestionAdapter(Question question) {
         objects = questionToArray(question);
     }
 
     @Override
-    public QuestionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)                                                                                                                     {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)                                                                                                                     {
         View v;
-        if (viewType == 0) {
-            v = LayoutInflater.from(parent.getContext()).inflate(titleResource, parent, false);
-        } else {
-            v = LayoutInflater.from(parent.getContext()).inflate(itemResource, parent, false);
+        RecyclerView.ViewHolder viewHolder;
+        switch (viewType) {
+            case 0:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.question, parent, false);
+                viewHolder = new QuestionViewHolder(v);
+                break;
+            case 1:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.answer, parent, false);
+                viewHolder = new AnswerViewHolder(v);
+                break;
+            case 2:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment, parent, false);
+                viewHolder = new CommentViewHolder(v);
+                break;
+            default:
+                viewHolder = null;
         }
-        return new ViewHolder(v);
+        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        View view = holder.view;
-        if (getItemViewType(position) == 0) {
-            TextView titleField = (TextView) view.findViewById(titleViewResourceId);
-            String title = ((Question)objects.get(0)).getTitle();
-            titleField.setText(title);
-            return;
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (getItemViewType(position)) {
+            case 0:
+                Question question = (Question) objects.get(position);
+                ((QuestionViewHolder)holder).titleField.setText(question.getTitle());
+                ((QuestionViewHolder)holder).authorField.setText(question.getAuthor().getName());
+                ((QuestionViewHolder)holder).textField.setText(fromHtml(question.getText()));
+                ((QuestionViewHolder)holder).textField.setMovementMethod(LinkMovementMethod.getInstance());
+                break;
+            case 1:
+                Answer answer = (Answer) objects.get(position);
+                ((AnswerViewHolder)holder).authorField.setText(answer.getAuthor().getName());
+                ((AnswerViewHolder)holder).textField.setText(fromHtml(answer.getText()));
+                ((AnswerViewHolder)holder).textField.setMovementMethod(LinkMovementMethod.getInstance());
+                break;
+            case 2:
+                Comment comment = (Comment) objects.get(position);
+                ((CommentViewHolder)holder).authorField.setText(comment.getAuthor().getName());
+                ((CommentViewHolder)holder).textField.setText(fromHtml(comment.getText()));
+                ((CommentViewHolder)holder).textField.setMovementMethod(LinkMovementMethod.getInstance());
+                break;
         }
-        TextView nameAuthorField = (TextView) view.findViewById(nameAuthorViewResourceId);
-        TextView textMessageField = (TextView) view.findViewById(textMessageViewResourceId);
-        String nameAuthor = "";
-        String textMessage = "";
-        Object object = objects.get(position - 1);
-        final String questionClassName = Question.class.getName();
-        final String answerClassName = Answer.class.getName();
-        final String commentClassName = Comment.class.getName();
-        String objectClassName = object.getClass().getName();
-        if (objectClassName == questionClassName) {
-            nameAuthor = ((Question)object).getAuthor().getName();
-            textMessage = ((Question)object).getText();
-        } else if (objectClassName == answerClassName) {
-            nameAuthor = ((Answer)object).getAuthor().getName();
-            textMessage = ((Answer)object).getText();
-        } else if (objectClassName == commentClassName) {
-            nameAuthor = ((Comment)object).getAuthor().getName();
-            textMessage = ((Comment)object).getText();
-        }
-        textMessageField.setMovementMethod(LinkMovementMethod.getInstance());
-        nameAuthorField.setText(nameAuthor);
-        textMessageField.setText(fromHtml(textMessage));
     }
 
     @Override
     public int getItemCount() {
-        return objects.size() + 1;
+        return objects.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        switch (position) {
-            case 0 : return 0;
-            default: return 1;
+        String className = objects.get(position).getClass().getName();
+        final String questionClassName = Question.class.getName();
+        final String answerClassName = Answer.class.getName();
+        final String commentClassName = Comment.class.getName();
+        int result;
+        if (className == questionClassName) {
+            result = 0;
+        } else if (className == answerClassName) {
+            result = 1;
+        } else if (className == commentClassName) {
+            result = 2;
+        } else {
+            result = -1;
         }
+        return result;
     }
 
     private ArrayList<Object> questionToArray(Question question) {
@@ -137,4 +134,40 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
         }
         return result;
     }
+
+    private class QuestionViewHolder extends RecyclerView.ViewHolder {
+        private TextView titleField;
+        private TextView authorField;
+        private TextView textField;
+
+        public QuestionViewHolder(View v) {
+            super(v);
+            titleField = (TextView) v.findViewById(R.id.title);
+            authorField = (TextView) v.findViewById(R.id.author);
+            textField = (TextView) v.findViewById(R.id.text);
+        }
+    }
+
+    private class AnswerViewHolder extends RecyclerView.ViewHolder {
+        private TextView authorField;
+        private TextView textField;
+
+        public AnswerViewHolder(View v) {
+            super(v);
+            authorField = (TextView) v.findViewById(R.id.author);
+            textField = (TextView) v.findViewById(R.id.text);
+        }
+    }
+
+    private class CommentViewHolder extends RecyclerView.ViewHolder {
+        private TextView authorField;
+        private TextView textField;
+
+        public CommentViewHolder(View v) {
+            super(v);
+            authorField = (TextView) v.findViewById(R.id.author);
+            textField = (TextView) v.findViewById(R.id.text);
+        }
+    }
+
 }

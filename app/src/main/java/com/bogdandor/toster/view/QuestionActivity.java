@@ -22,6 +22,8 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
         questionView = (RecyclerView) findViewById(R.id.activity_question);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        questionView.setLayoutManager(linearLayoutManager);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
@@ -38,10 +40,7 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
     }
 
     public void showQuestion(Question question) {
-        //title.setText(question.getTitle());
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        questionView.setLayoutManager(linearLayoutManager);
-        QuestionAdapter adapter = new QuestionAdapter(R.layout.question_header, R.id.title, R.layout.item, R.id.name_author, R.id.text_message, question);
+        QuestionAdapter adapter = new QuestionAdapter(question);
         questionView.setAdapter(adapter);
     }
 
