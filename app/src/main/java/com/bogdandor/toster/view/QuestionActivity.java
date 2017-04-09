@@ -4,9 +4,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ExpandableListView;
-import android.widget.TextView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.bogdandor.toster.presenter.QuestionPresenter;
 import com.bogdandor.toster.R;
@@ -14,9 +13,7 @@ import com.bogdandor.toster.entity.Question;
 
 public class QuestionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<QuestionPresenter> {
     public static final String QUESTION_URL = "questionUrl";
-    private View header;
-    private TextView title;
-    private ExpandableListView questionView;
+    private RecyclerView questionView;
     private QuestionPresenter presenter;
     private static final int LOADER_ID = 102;
 
@@ -24,10 +21,9 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
-        header = getLayoutInflater().inflate(R.layout.question_header, null);
-        title = (TextView) header.findViewById(R.id.title);
-        questionView = (ExpandableListView) findViewById(R.id.question_view);
-        questionView.addHeaderView(header);
+        questionView = (RecyclerView) findViewById(R.id.activity_question);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        questionView.setLayoutManager(linearLayoutManager);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
@@ -44,8 +40,7 @@ public class QuestionActivity extends AppCompatActivity implements LoaderManager
     }
 
     public void showQuestion(Question question) {
-        title.setText(question.getTitle());
-        QuestionAdapter adapter = new QuestionAdapter(this, question);
+        QuestionAdapter adapter = new QuestionAdapter(question);
         questionView.setAdapter(adapter);
     }
 

@@ -4,6 +4,7 @@ public class Question {
     private String title;
     private String url;
     private String text;
+    private Author author;
     private Answer[] answers;
     private Comment[] comments;
 
@@ -29,6 +30,14 @@ public class Question {
 
     public String getText() {
         return text;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
+    public Author getAuthor() {
+        return author;
     }
 
     public void setAswers(Answer[] answers) {
