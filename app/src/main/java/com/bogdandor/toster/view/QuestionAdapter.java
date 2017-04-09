@@ -1,16 +1,13 @@
 package com.bogdandor.toster.view;
 
-import android.content.Context;
 import android.os.Build;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.bogdandor.toster.R;
@@ -18,130 +15,113 @@ import com.bogdandor.toster.entity.Answer;
 import com.bogdandor.toster.entity.Comment;
 import com.bogdandor.toster.entity.Question;
 
-public class QuestionAdapter extends BaseExpandableListAdapter {
-    private Question question;
-    private LayoutInflater inflater;
+import java.util.ArrayList;
 
-    public QuestionAdapter(Context context, Question question) {
-        inflater = LayoutInflater.from(context);
-        this.question = question;
+public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private ArrayList<Object> objects;
+
+    public QuestionAdapter(Question question) {
+        objects = questionToArray(question);
     }
 
     @Override
-    public int getGroupCount() {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)                                                                                                                     {
+        View v;
+        RecyclerView.ViewHolder viewHolder;
+        switch (viewType) {
+            case 0:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.question, parent, false);
+                viewHolder = new QuestionViewHolder(v);
+                break;
+            case 1:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.answer, parent, false);
+                viewHolder = new AnswerViewHolder(v);
+                break;
+            case 2:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment, parent, false);
+                viewHolder = new CommentViewHolder(v);
+                break;
+            default:
+                viewHolder = null;
+        }
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (getItemViewType(position)) {
+            case 0:
+                Question question = (Question) objects.get(position);
+                ((QuestionViewHolder)holder).titleField.setText(question.getTitle());
+                ((QuestionViewHolder)holder).authorField.setText(question.getAuthor().getName());
+                ((QuestionViewHolder)holder).textField.setText(fromHtml(question.getText()));
+                ((QuestionViewHolder)holder).textField.setMovementMethod(LinkMovementMethod.getInstance());
+                break;
+            case 1:
+                Answer answer = (Answer) objects.get(position);
+                ((AnswerViewHolder)holder).authorField.setText(answer.getAuthor().getName());
+                ((AnswerViewHolder)holder).textField.setText(fromHtml(answer.getText()));
+                ((AnswerViewHolder)holder).textField.setMovementMethod(LinkMovementMethod.getInstance());
+                break;
+            case 2:
+                Comment comment = (Comment) objects.get(position);
+                ((CommentViewHolder)holder).authorField.setText(comment.getAuthor().getName());
+                ((CommentViewHolder)holder).textField.setText(fromHtml(comment.getText()));
+                ((CommentViewHolder)holder).textField.setMovementMethod(LinkMovementMethod.getInstance());
+                break;
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return objects.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        String className = objects.get(position).getClass().getName();
+        final String questionClassName = Question.class.getName();
+        final String answerClassName = Answer.class.getName();
+        final String commentClassName = Comment.class.getName();
+        int result;
+        if (className == questionClassName) {
+            result = 0;
+        } else if (className == answerClassName) {
+            result = 1;
+        } else if (className == commentClassName) {
+            result = 2;
+        } else {
+            result = -1;
+        }
+        return result;
+    }
+
+    private ArrayList<Object> questionToArray(Question question) {
+        ArrayList<Object> arrayList = new ArrayList<>();
+        if (question == null) {
+            return arrayList;
+        }
+        arrayList.add(question);
+        Comment[] comments = question.getComments();
+        if (comments != null) {
+            for (Comment c : comments) {
+                arrayList.add(c);
+            }
+        }
         Answer[] answers = question.getAnswers();
         if (answers == null) {
-            return 1 * 2;
+            return arrayList;
         }
-        return (answers.length + 1) * 2;
-    }
-
-    @Override
-    public int getChildrenCount(int groupPosition) {
-        Comment[] comments;
-        if (groupPosition % 2 == 0) {
-            return 0;
-        }
-        if (groupPosition == 1) {
-            comments = question.getComments();
-        } else {
-            comments = question.getAnswers()[groupPosition/2 - 1].getComments();
-        }
-        if (comments == null) {
-            return 0;
-        }
-        return comments.length;
-    }
-
-    @Override
-    public Object getGroup(int groupPosition) {
-        if (groupPosition % 2 != 0) {
-            return null;
-        }
-        if (groupPosition == 0) {
-            return question;
-        }
-        return question.getAnswers()[(groupPosition / 2) - 1];
-    }
-
-    @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        Comment[] comments;
-        if (groupPosition % 2 == 0) {
-            return null;
-        }
-        if (groupPosition == 1) {
-            comments = question.getComments();
-        } else {
-            comments = question.getAnswers()[groupPosition/2 - 1].getComments();
-        }
-        return comments[childPosition];
-    }
-
-    @Override
-    public long getGroupId(int groupPosition) {
-        return groupPosition;
-    }
-
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return childPosition;
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    @Override
-    public View getGroupView(final int groupPosition, boolean isExpanded,
-                             View convertView, ViewGroup parent) {
-        if (groupPosition % 2 != 0) {
-            convertView = inflater.inflate(R.layout.group_indicator, null);
-            TextView groupIndicator = (TextView) convertView.findViewById(R.id.group_indicator);
-            if (getChildrenCount(groupPosition) == 0) {
-                groupIndicator.setText(R.string.no_comments_yet);
-            } else if (isExpanded) {
-                groupIndicator.setText(R.string.hide_comments);
-            } else {
-                groupIndicator.setText(R.string.show_comments);
+        for (Answer a : answers) {
+            arrayList.add(a);
+            comments = a.getComments();
+            if (comments != null) {
+                for (Comment c : comments) {
+                    arrayList.add(c);
+                }
             }
-        } else {
-            convertView = inflater.inflate(R.layout.group_content, null);
-            String text;
-            String authorAnswer;
-            if (groupPosition == 0) {
-                text = question.getText();
-                authorAnswer = question.getAuthor().getName();
-            } else {
-                text = ((Answer)getGroup(groupPosition)).getText();
-                authorAnswer = ((Answer)getGroup(groupPosition)).getAuthor().getName();
-            }
-            TextView textGroup = (TextView) convertView.findViewById(R.id.text_group);
-            TextView answerAuthor = (TextView) convertView.findViewById(R.id.answer_author);
-            textGroup.setMovementMethod(LinkMovementMethod.getInstance());
-            textGroup.setText(fromHtml(text));
-            answerAuthor.setText(authorAnswer);
-         }
-        return convertView;
-    }
-
-    @Override
-    public View getChildView(int groupPosition, int childPosition,
-                             boolean isLastChild, View convertView, ViewGroup parent) {
-        convertView = inflater.inflate(R.layout.item, parent, false);
-        Comment comment = (Comment) getChild(groupPosition, childPosition);
-        TextView textItem = (TextView) convertView.findViewById(R.id.text_item);
-        TextView authorComment = (TextView) convertView.findViewById(R.id.comment_author);
-        textItem.setMovementMethod(LinkMovementMethod.getInstance());
-        textItem.setText(fromHtml(comment.getText()));
-        authorComment.setText(comment.getAuthor().getName());
-        return convertView;
-    }
-
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        }
+        return arrayList;
     }
 
     @SuppressWarnings("deprecation")
@@ -154,4 +134,40 @@ public class QuestionAdapter extends BaseExpandableListAdapter {
         }
         return result;
     }
+
+    private class QuestionViewHolder extends RecyclerView.ViewHolder {
+        private TextView titleField;
+        private TextView authorField;
+        private TextView textField;
+
+        public QuestionViewHolder(View v) {
+            super(v);
+            titleField = (TextView) v.findViewById(R.id.title);
+            authorField = (TextView) v.findViewById(R.id.author);
+            textField = (TextView) v.findViewById(R.id.text);
+        }
+    }
+
+    private class AnswerViewHolder extends RecyclerView.ViewHolder {
+        private TextView authorField;
+        private TextView textField;
+
+        public AnswerViewHolder(View v) {
+            super(v);
+            authorField = (TextView) v.findViewById(R.id.author);
+            textField = (TextView) v.findViewById(R.id.text);
+        }
+    }
+
+    private class CommentViewHolder extends RecyclerView.ViewHolder {
+        private TextView authorField;
+        private TextView textField;
+
+        public CommentViewHolder(View v) {
+            super(v);
+            authorField = (TextView) v.findViewById(R.id.author);
+            textField = (TextView) v.findViewById(R.id.text);
+        }
+    }
+
 }
