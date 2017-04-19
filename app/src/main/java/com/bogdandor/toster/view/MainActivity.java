@@ -1,10 +1,17 @@
 package com.bogdandor.toster.view;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,9 +23,13 @@ import com.bogdandor.toster.R;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<MainPresenter> {
     private View footer;
+    private DrawerLayout drawer;
+    private Toolbar toolbar;
+    private NavigationView navigationView;
     private ListView listQuestions;
     private Button prev;
     private Button next;
+    private ActionBarDrawerToggle drawerToggle;
     private MainPresenter presenter;
     private static final int LOADER_ID = 101;
 
@@ -27,11 +38,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         footer = getLayoutInflater().inflate(R.layout.main_footer, null);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         listQuestions = (ListView) findViewById(R.id.list_questions);
         prev = (Button) footer.findViewById(R.id.prev);
         next = (Button) footer.findViewById(R.id.next);
         listQuestions.addFooterView(footer);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+        setSupportActionBar(toolbar);
+        drawer = (DrawerLayout) findViewById(R.id.activity_main);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationItemSelectedListener());
     }
 
     @Override
@@ -44,6 +60,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onStop() {
         presenter.onViewDetached();
         super.onStop();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int i = item.getItemId();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawer.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void onClickPrev(View view) {
@@ -109,5 +136,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<MainPresenter> loader) {
         presenter = null;
+    }
+
+    private class NavigationItemSelectedListener implements NavigationView.OnNavigationItemSelectedListener {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            int i = item.getItemId();
+            switch (item.getItemId()) {
+                case R.id.latest:
+                    presenter.onLatestClick();
+                    break;
+                case R.id.interesting:
+                    presenter.onInterestingClick();
+                    break;
+                case R.id.without_answer:
+                    presenter.onWithoutAnswerClick();
+                    break;
+            }
+            item.setChecked(true);
+            setTitle(item.getTitle());
+            drawer.closeDrawers();
+            return false;
+        }
     }
 }

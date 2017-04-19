@@ -3,4 +3,7 @@
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="text">Text</string>
+    <string name="latest">Новые</string>
+    <string name="interesting">Интересные</string>
+    <string name="without_answer">Без ответа</string>
 </resources>
