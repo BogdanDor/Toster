@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Toster</string>
-    <string name="show_comments">Показать комментарии</string>
-    <string name="hide_comments">Скрыть комментарии</string>
-    <string name="no_comments_yet">Нет комментариев</string>
+    <string name="title">Title</string>
+    <string name="author">Author</string>
+    <string name="text">Text</string>
+    <string name="latest">Новые</string>
+    <string name="interesting">Интересные</string>
+    <string name="without_answer">Без ответа</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
 </resources>

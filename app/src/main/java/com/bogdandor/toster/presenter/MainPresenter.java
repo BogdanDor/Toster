@@ -31,6 +31,21 @@ public class MainPresenter implements Presenter<MainActivity> {
         view.showQuestion(urlQuestion);
     }
 
+    public void onLatestClick() {
+        String pageQuestions = "https://toster.ru/questions/latest";
+        new DownloaderPageQuestions().execute(pageQuestions);
+    }
+
+    public void onInterestingClick() {
+        String pageQuestions = "https://toster.ru/questions/interesting";
+        new DownloaderPageQuestions().execute(pageQuestions);
+    }
+
+    public void onWithoutAnswerClick() {
+        String pageQuestions = "https://toster.ru/questions/without_answer";
+        new DownloaderPageQuestions().execute(pageQuestions);
+    }
+
     @Override
     public void onViewAttached(MainActivity view) {
         this.view = view;
