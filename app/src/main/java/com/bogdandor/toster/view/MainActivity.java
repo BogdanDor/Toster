@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private ListView listQuestions;
     private Button prev;
     private Button next;
-    private ActionBarDrawerToggle drawerToggle;
     private MainPresenter presenter;
     private static final int LOADER_ID = 101;
 
@@ -38,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         footer = getLayoutInflater().inflate(R.layout.main_footer, null);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        drawer = (DrawerLayout) findViewById(R.id.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         listQuestions = (ListView) findViewById(R.id.list_questions);
         prev = (Button) footer.findViewById(R.id.prev);
@@ -45,9 +46,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         listQuestions.addFooterView(footer);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
         setSupportActionBar(toolbar);
-        drawer = (DrawerLayout) findViewById(R.id.activity_main);
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationItemSelectedListener());
+        drawer.addDrawerListener(new ActionBarDrawerToggle(this, drawer, R.string.drawer_open, R.string.drawer_close));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     @Override

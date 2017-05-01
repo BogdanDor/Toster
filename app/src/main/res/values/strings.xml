@@ -6,4 +6,6 @@
     <string name="latest">Новые</string>
     <string name="interesting">Интересные</string>
     <string name="without_answer">Без ответа</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
 </resources>
